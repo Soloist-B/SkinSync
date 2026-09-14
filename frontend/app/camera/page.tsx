@@ -160,13 +160,16 @@ export default function CameraPage() {
     setLoading(true);
     setErrorMessage(null);
 
-    // คำนวณ API URL อัตโนมัติ: ถ้าเข้าผ่าน IP เครื่อง เช่น 192.168.x.x ให้ส่งไปที่ IP นั้นที่พอร์ต 8000
-    let apiUrl = 'http://127.0.0.1:8000';
-    if (typeof window !== 'undefined') {
-      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    // ลำดับความสำคัญของ API URL:
+    // 1. ดึงจาก NEXT_PUBLIC_API_URL ใน Environment Variables ก่อนเสมอ (เช่น ngrok หรือ Cloud Backend)
+    // 2. ถ้าไม่ได้ตั้งไว้ และเปิดผ่าน IP เครื่อง Local (192.168.x.x) ให้ส่งไปที่พอร์ต 8000 ของเครื่องนั้น
+    // 3. ค่าเริ่มต้น 127.0.0.1:8000
+    let apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '') || '';
+    if (!apiUrl) {
+      if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
         apiUrl = `http://${window.location.hostname}:8000`;
-      } else if (process.env.NEXT_PUBLIC_API_URL) {
-        apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      } else {
+        apiUrl = 'http://127.0.0.1:8000';
       }
     }
 
@@ -177,6 +180,9 @@ export default function CameraPage() {
 
       const response = await fetch(`${apiUrl}/predict`, {
         method: 'POST',
+        headers: {
+          'ngrok-skip-browser-warning': '69420',
+        },
         body: formData,
       });
 
