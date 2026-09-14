@@ -1,0 +1,207 @@
+ระบบประมวลผลข้อมูล AI Skin Analysis & Questionnaire Triage 
+(Rules-Based System) 
+ส่วนที่ 1: ตรรกะฝั ่ง AI Detection (Targeting Actives) 
+การกําหนดสารออกฤทธิ์หลัก (Primary Actives) และสารออกฤทธิ์รอง (Secondary Actives) อ้างอิง
+จากกลไกการเกิดโรค (Mechanism of Action) ระดับเซลล์ พร้อมระบุความเข้มข้นที่งานวิจัยรองรับ 
+(Effective Concentration) 
+1.1 ปัญหาสิวอักเสบ (Inflammatory Acne: Papules, Pustules, Nodules) 
+● กลไกการเกิดโรค (Pathophysiology): การเพิ่มจํานวนของเชื้อแบคทีเรีย Cutibacterium 
+acnes (C. acnes) กระตุ ้นระบบภูมิคุ ้มกันผ่าน Toll-like receptor 2 (TLR-2) ส่งผลให้เกิดการ
+หลั่ง Pro-inflammatory cytokines (IL-1, IL-8) และเกิดกระบวนการอักเสบระดับเนื้อเยื่อ 
+● สารออกฤทธิ์หลัก (Primary Actives): 
+○ Benzoyl Peroxide (BPO): ปล่อย Reactive Oxygen Species (ROS) ทําลายผนัง
+เซลล์และโปรตีนของแบคทีเรีย เป็นสารต้านแบคทีเรียมาตรฐานทองคําที่เชื้อไม่
+สามารถดื้อยาได้ ฆ่าเชื้อแบคทีเรีย C. acnes ที่เป็นต้นเหตุของสิวอักเสบ และช่วยลด
+การดึงระบม 
+○ Salicylic Acid (BHA): ซึมเข้าสู ่รูขุมขนเพื่อลดการอุดตันและมีฤทธิ์ลดการอักเสบ 
+○ Azelaic Acid: ช่วยต้านเชื้อแบคทีเรียและลดอาการอักเสบแดงของสิว 
+○ Succinic Acid: ยับยั ้งการเจริญเติบโตของเชื้อแบคทีเรียและลดการเกิดสิวโดยไม่
+รบกวนไมโครไบโอม เป็นสารทางเลือกใหม่สําหรับผู ้ที่แพ้ BPO 
+● สารเสริมประสิทธิภาพ (Secondary Actives): 
+○ Niacinamide: ยับยั ้งการหลั่ง IL-6 ช่วยลดบวมแดง 
+○ Licochalcone A: ยับยั ้งเอนไซม์ Cyclooxygenase-2 (COX-2) ลดการอักเสบอย่าง
+ฉับพลัน 
+○ Centella Asiatica / Zinc PCA: ปลอบประโลมผิว ลดการระคายเคือง และช่วย
+ควบคุมความมัน 
+● กฎการห้ามใช้ (Contraindication Logic): 
+○ IF Inflammatory Acne = High THEN AVOID Physical Scrubs / Abrasives ห้าม
+ขัดถูผิว เพราะจะทําให้เชื้อกระจายและอักเสบรุนแรงขึ้น 
+○ ห้ามจ่าย BPO คู่กับ Antioxidants ที่ไวต่อการถูกออกซิไดซ์ เช่น L-Ascorbic Acid 
+1.2 ปัญหาสิวอุดตันหัวดํา (Blackheads / Open Comedones) 
+● กลไกการเกิดโรค: เกิดจากการอุดตันของนํ้ามัน (Sebum) และเซลล์ผิวที่ตายแล้วในรูขุมขนที่ 
+"เปิดกว้างออกสู ่ผิวภายนอก" ทําให้ไขมันทําปฏิกิริยากับออกซิเจนในอากาศ (Oxidation) เกิด
+เป็นสารสีดํา (Melanin/Oxidized lipids) อุดตันอยู่หัวรูขุมขน 
+● สารออกฤทธิ์หลัก (Primary Actives): 
+○ Topical Retinoids (Adapalene, Retinol, Retinaldehyde): จับกับ Retinoic 
+Acid Receptors (RARs) ในนิวเคลียส สั่งการเร่งกระบวนการผลัดเซลล์ผิวให้เป็นปกติ 
+เร่งวงจรการผลัดเซลล์ผิว ป้องกันไม่ให้ไขมันและเซลล์ผิวตายสะสมจนเกิดหัวสิวใหม่ 
+ปรับการทํางานของเซลล์ผิวให้เป็นปกติ ลดการก่อตัวของสิ่งอุดตันใต้ผิวหนัง 
+○ Salicylic Acid (BHA): กรดละลายในไขมัน ซึมแทรกเข้าสลายพันธะ Desmosomes 
+ในท่อรูขุมขน ละลายในนํ้ามันได้ดี ซึมลึกไปสลายนํ้ามันส่วนเกินและเซลล์ผิวเก่าที่อุด
+ตันในรูขุมขน ช่วยสลายไขมันที่อุดตันอยู่ใต้ชั ้นผิว 
+○ AHA (Glycolic Acid / Lactic Acid): ผลัดเซลล์ผิวชั ้นนอกที่ตายแล้วซึ่งปกคลุม
+ปากรูขุมขนอยู่ 
+● สารออกฤทธิ์รอง (Alternative Actives สําหรับผิวแพ้ง่าย): 
+○ Bakuchiol: สารสกัดจากพืชที่ออกฤทธิ์คล้าย Retinol แต่ไม่มีผลข้างเคียงเรื่องผิว
+ลอกแดง 
+○ LHA (Capryloyl Salicylic Acid): อนุพันธ์ของ BHA ที่มีโมเลกุลใหญ่กว่า ซึมช้า
+กว่า อ่อนโยนกว่า 
+● กฎการห้ามใช้ (Contraindication Logic): 
+○ AVOID Highly Comedogenic Ingredients เช่น Isopropyl Myristate, Coconut Oil, 
+Cocoa Butter, Laureth-4 
+1.3 ปัญหาสิวอุดตันหัวขาว (Whiteheads / Closed Comedones) 
+● กลไกการเกิดโรค: เกิดจากภาวะ Hyperkeratinization โดยที่ปากรูขุมขน "ปิดสนิท" (Closed 
+comedones) เซลล์ผิวชั ้นขี้ไคลหนาตัวขึ้นจนไปปิดกั ้นทางออกของนํ้ามัน ทําให้ Sebum และ
+เซลล์ผิวที่ตายแล้วถูกกักเก็บอยู่ใต้ชั ้นผิวหนัง กลายเป็นตุ่มนูนเม็ดเล็กๆ สีขาวหรือสีเนื้อ 
+● สารออกฤทธิ์หลัก (Primary Actives): 
+○ Topical Retinoids (Adapalene, Retinol, Retinaldehyde): จับกับ Retinoic 
+Acid Receptors (RARs) ในนิวเคลียส สั่งการเร่งกระบวนการผลัดเซลล์ผิวให้เป็นปกติ 
+เร่งวงจรการผลัดเซลล์ผิว ป้องกันไม่ให้ไขมันและเซลล์ผิวตายสะสมจนเกิดหัวสิวใหม่ 
+ปรับการทํางานของเซลล์ผิวให้เป็นปกติ ลดการก่อตัวของสิ่งอุดตันใต้ผิวหนัง 
+○ Salicylic Acid (BHA): กรดละลายในไขมัน ซึมแทรกเข้าสลายพันธะ Desmosomes 
+ในท่อรูขุมขน ละลายในนํ้ามันได้ดี ซึมลึกไปสลายนํ้ามันส่วนเกินและเซลล์ผิวเก่าที่อุด
+ตันในรูขุมขน ช่วยสลายไขมันที่อุดตันอยู่ใต้ชั ้นผิว 
+○ AHA (Glycolic Acid / Lactic Acid): ผลัดเซลล์ผิวชั ้นนอกที่ตายแล้วซึ่งปกคลุม
+ปากรูขุมขนอยู่ 
+● สารออกฤทธิ์รอง (Alternative Actives สําหรับผิวแพ้ง่าย): 
+○ PHA (Gluconolactone / Lactobionic Acid): กรดรุ่นใหม่ที่มีโมเลกุลใหญ่ ช่วย
+ผลัดเซลล์ผิวชั ้นนอกอย่างอ่อนโยนโดยไม่ทําให้ผิวระคายเคือง 
+● กฎการห้ามใช้ (Contraindication Logic): 
+○ AVOID Heavy Occlusives / Comedogenic Butters เลี่ยงการใช้ผลิตภัณฑ์เนื้อครีม
+ที่หนักและเหนอะหนะเกินไป เพื่อไม่ให้ไปเคลือบปิดปากรูขุมขนที่ปิดสนิทอยู่แล้วให้แย่
+ลง 
+1.4 ปัญหาความผิดปกติของเม็ดสี ฝ้ า กระ รอยดํา (Pigmentation, Dark Spots, Melasma, 
+PIH) 
+● กลไกการเกิดโรค: การกระตุ ้นเอนไซม์ Tyrosinase จากรังสี UV, ฮอร์โมน หรือกระบวนการ
+อักเสบ ทําให้ผลิตเม็ดสีเมลานิน และส่งผ่านถุงหุ ้มเม็ดสีไปยังผิวชั ้นบน 
+● สารออกฤทธิ์หลัก (Primary Actives): 
+○ Thiamidol: สารยับยั ้ง Tyrosinase ของมนุษย์ที่มีประสิทธิภาพสูงสุดในปัจจุบัน 
+○ Vitamin C (L-Ascorbic Acid): จับกับไอออนทองแดงที่ Active Site ของเอนไซม์ 
+ต้านอนุมูลอิสระ ยับยั ้งเอนไซม์ Tyrosinase ช่วยให้จุดด่างดําจางลง 
+○ Alpha Arbutin: ยับยั ้งเม็ดสีโดยไม่เป็นพิษต่อเซลล์ ยับยั ้งกระบวนการสร้างเม็ดสีเมลา
+นิน เหมาะมากสําหรับฝ้า กระ และรอยดําลึก 
+○ Tranexamic Acid: ยับยั ้ง Plasminogen ลดการหลั่ง Arachidonic Acid ตัดวงจรการ
+เกิดฝ้าและรอยดําหลังการอักเสบ ยับยั ้งกระบวนการสร้างเม็ดสีเมลานิน 
+○ Hexylresorcinol: สารปรับสีผิวทรงพลังที่มีวิจัยเทียบเท่า Hydroquinone 2% 
+○ Cysteamine: ลดปริมาณ L-cystine ยับยั ้งกระบวนการสร้างเม็ดสีอย่างครอบคลุม 
+สําหรับรักษากรณีฝ้าดื้อยา 
+○ Niacinamide: สกัดกั ้นไม่ให้เมลานินเคลื่อนตัวไปยังเซลล์ Keratinocyte สกัดกั ้นการ
+ส่งผ่านเม็ดสีเมลานินขึ้นมายังผิวชั ้นบน 
+○ AHA: เร่งการผลัดเซลล์ผิวที่มีเม็ดสีสะสมออกอย่างอ่อนโยน 
+● กฎการห้ามใช้ (Contraindication Logic): 
+○ ห้ามจับคู่ L-Ascorbic Acid + Copper Peptides เพราะเกิดกระบวนการ Chelation 
+ทําให้วิตามินซีเสื่อมสภาพ 
+○ ห้ามใช้ Cysteamine แบบทาทิ้งไว้ข้ามคืน ต้องใช้แบบ Short-contact therapy ทา 15 
+นาทีแล้วล้างออก 
+1.5 ปัญหารอยแดง เส้นเลือดฝอย ผิวอักเสบ (Redness, Rosacea-prone, PIE) 
+● กลไกการเกิดโรค: การขยายตัวของเส้นเลือดฝอยชั ้นใต้ผิวหนังจากการตอบสนองต่อการ
+อักเสบ หรือภาวะภูมิคุ ้มกันผิวไวเกิน 
+● สารออกฤทธิ์หลัก (Primary Actives): 
+○ Azelaic Acid: ยับยั ้ง Kallikrein-5 (KLK5) และ Cathelicidin (LL-37) pathway ซึ่ง
+เป็นกลไกหลักของการเกิดเส้นเลือดขยายตัวและหน้าแดง ลดรอยแดงจากการอักเสบ
+และรอยแดงจากเส้นเลือดฝอย 
+○ Niacinamide (Vitamin B3): ลดการอักเสบ เสริมสร้างเกราะป้องกันผิว และลดรอย
+แดงหลังสิวหาย 
+○ Centella Asiatica (TECA): เน้นอนุพันธ์ Madecassoside และ Asiaticoside ช่วย
+ลดกระบวนการอักเสบและเร่งการสมานแผลเส้นเลือด 
+○ Panthenol (Vitamin B5) / Allantoin: เติมความชุ ่มชื้น ปลอบประโลมผิว และลด
+อาการระคายเคือง 
+○ Ectoin: สารกลุ่ม Extremolyte สร้างเกราะนํ้าล้อมรอบเซลล์ ป้องกันความเสียหายจาก 
+Stress factors และลดอาการแดงฉับพลัน 
+● กฎการห้ามใช้ (Contraindication Logic): 
+○ IF Redness = High ห้ามจ่ายสารที่ออกฤทธิ์เป็น Vasodilators หรือก่อการระคายเคือง
+สูง เช่น AHA เข้มข้นสูง, Menthol, Peppermint, Camphor, Eucalyptus 
+1.6 ปัญหารูขุมขนกว้าง (Enlarged Pores) 
+● กลไกการเกิดโรค: การผลิต Sebum ที่มากเกินไปทําให้ท่อรูขุมขนขยาย และการเสื่อมสลาย
+ของโครงสร้างคอลลาเจนรอบรูขุมขนตามอายุ 
+● สารออกฤทธิ์หลัก (Primary Actives): 
+○ Niacinamide: ควบคุมการผลิตนํ้ามันส่วนเกินและช่วยให้ขนาดรูขุมขนแลดูกระชับขึ้น 
+○ Salicylic Acid (BHA): เคลียร์สิ่งสกปรกและนํ้ามันตกค้างในรูขุมขน ไม่ให้รูขุมขน
+ขยายกว้างจากการอุดตัน 
+○ Zinc PCA: ยับยั ้งเอนไซม์ 5-alpha reductase ชนิดที่ 1 ลดปริมาณการผลิตนํ้ามันจาก
+ต่อมไขมันโดยตรง 
+○ Retinoids: กระตุ ้นคอลลาเจนเพื่อพยุงโครงสร้างรอบรูขุมขนไม่ให้หย่อนคล้อย กระตุ ้น
+การสร้างคอลลาเจนรอบๆ ผนังรูขุมขน ทําให้โครงสร้างผิวกระชับและรูขุมขนดูเล็กลง 
+○ Enantia Chlorantha Bark Extract + Oleanolic Acid: มีวิจัยทางคลินิกรองรับการ
+ลดขนาดรูขุมขนและความมัน 
+● กฎการห้ามใช้ (Contraindication Logic): 
+○ AVOID Astringents / High Alcohol Denat เพราะแม้จะให้สัมผัสที่แห้งแมตต์ชั่วคราว 
+แต่จะไปกระตุ ้นวงจร Rebound Seborrhea 
+1.7 ปัญหาริ้วรอยและโครงสร้างผิวเสื่อมสภาพ (Wrinkles & Structural Aging) 
+● กลไกการเกิดโรค: รังสี UVA กระตุ ้นเอนไซม์ Matrix Metalloproteinases (MMPs) ให้
+เข้าไปย่อยสลาย Collagen Type I, III และ Elastin เสื่อมสภาพ 
+● สารออกฤทธิ์หลัก (Primary Actives): 
+○ Retinoids (Retinol / Retinaldehyde / Bakuchiol): จับกับ RARs กระตุ ้น 
+Fibroblast ให้สร้างคอลลาเจนใหม่ และยับยั ้งการทํางานของ MMPs กระตุ ้นการสร้าง
+คอลลาเจนและฟื้นฟูโครงสร้างผิว 
+○ Peptides (Copper Peptides, Matrixyl): ดึงไอออนทองแดงเข้าเซลล์ กระตุ ้น
+เอนไซม์ Lysyl Oxidase ที่จําเป็นต่อการสร้างคอลลาเจนและอีลาสติน ส่งสัญญาณ
+กระตุ ้นการสร้างคอลลาเจนและอิลาสติน เพิ่มความยืดหยุ่นให้ผิว 
+○ Vitamin C: ช่วยเสริมสร้างคอลลาเจนและปกป้องผิวจากการถูกทําลายโดยแสงแดด
+และมลภาวะ 
+○ Acetyl Hexapeptide-8 (Argireline): Neurotransmitter-inhibitor peptide ยับยั ้ง 
+SNARE complex ขัดขวางการส่งสัญญาณประสาทไปยังกล้ามเนื้อ ช่วยลด Dynamic 
+wrinkles 
+● สารออกฤทธิ์รอง (Secondary Actives): 
+○ Hyaluronic Acid / Polyglutamic Acid (PGA): ดึงนํ้าเข้าสู ่ผิวชั ้น Epidermis 
+เพื่อให้ร่องริ้วรอยตื้นฟูขึ้นทันที เติมนํ้าให้ผิวชั ้นนอกอุ ้มนํ้าได้ดีขึ้น ช่วยให้ริ้วรอยตื้นๆ ดู
+อิ่มฟูขึ้นทันที 
+● กฎการห้ามใช้ (Contraindication Logic): 
+○ เปปไทด์จะเสื่อมสภาพในสภาวะกรดจัด ห้ามใช้ร่วมกับ AHA/BHA หรือ L-Ascorbic 
+Acid ในขั ้นตอนเดียวกัน 
+ส่วนที่ 2: ฟิลเตอร์สรีรวิทยาเพื่อความปลอดภัย (Physiological Baseline & Triage Filters) 
+ข้อมูลจาก Questionnaire ทําหน้าที่เป็นระบบเบรกฉุกเฉินและกําหนดทิศทางเนื้อสัมผัส 
+● 2.1 ความสมบูรณ์ของเกราะป้องกันผิว (Skin Barrier Integrity & TEWL): อาการผิวแห้ง 
+ลอก แสบ ตึง คัน 
+○ IF Barrier = Compromised THEN OVERRIDE = TRUE BAN = หยุดจ่าย Active 
+ingredients กลุ่มผลัดเซลล์ผิวและ Retinoids ทุกชนิด ชั่วคราว MANDATORY 
+ADDITION = บังคับจ่ายสารกลุ่ม Lipid Matrix Repair ได้แก่ Ceramides + 
+Cholesterol + Free Fatty Acids ในอัตราส่วน 3:1:1 
+● 2.2 ระดับความไวผิวและภูมิคุ ้มกัน (Sensitivity & Immunological Reactivity): 
+ประวัติการเกิดผื่นแพ้สัมผัส แสบแดงง่าย 
+○ IF Sensitivity = High THEN BAN = Fragrance, Essential Oils, Alcohol Denat 
+และสารกันเสียก่อการระคายเคือง MODIFY = เปลี่ยน Vitamin C บริสุทธิ์ไปจ่าย
+อนุพันธ์ที่ pH เป็นกลางแทน เช่น THD Ascorbate หรือ SAP 
+● 2.3 ระดับการผลิตนํ ้ามัน (Sebum Excretion Rate - SER): ความมันวาวของใบหน้าหลัง
+ล้างหน้า 
+○ IF Sebum = Oily / Acne-Prone THEN VEHICLE TYPE = Aqueous-based, Gel, 
+Serum, Light fluid AVOID = สารกลุ่ม Highly Occlusive และกรดไขมัน Oleic Acid 
+สูง 
+○ IF Sebum = Dry / Alipidic THEN VEHICLE TYPE = W/O Emulsion 
+(Water-in-Oil), Cream, Balm PREFER = สารกลุ่ม Occlusives เคลือบผิวกันนํ้า
+ระเหย 
+● 2.4 ระดับสีผิวตามธรรมชาติ (Fitzpatrick Skin Phototype): การตอบสนองของผิวเมื่อเจอ
+แสงแดด 
+○ IF Fitzpatrick = Type IV, V, VI THEN BAN = ห้ามแนะนําการลอกผิวด้วยกรดความ
+เข้มข้นสูง MODIFY = เปลี่ยนไปใช้กรดโมเลกุลใหญ่ที่ซึมช้าและปลอดภัยกว่า CAP 
+LIMIT = การจ่าย Retinol ต้องจํากัดความเข้มข้นเริ่มต้นที่ระดับตํ ่าสุดเสมอ 
+ส่วนที่ 3: กฎข้อห้ามการผสมผสานเชิงเคมี (Chemical Incompatibility Matrix) 
+● pH Clash: ห้ามจับคู่ Peptides ทาพร้อมกับ L-Ascorbic Acid หรือ AHA เข้มข้น เพราะกรดจะ
+ไปทําลายพันธะเปปไทด์ 
+● Oxidative Clash: ห้ามจับคู่ Benzoyl Peroxide (BPO) + Antioxidants เพราะ BPO เป็นตัว
+ออกซิไดซ์ จะทําลายสารต้านอนุมูลอิสระทันที 
+● Irritation Threshold Exceeded: ห้ามระบบแนะนํา Retinoids คู่กับ AHA/BHA เข้มข้น ในผู ้
+ใช้ที่เป็น First-time user หรือมีประวัติผิวแพ้ง่าย 
+ส่วนที่ 4: ตัวอย่างสถานการณ์การทํางานของระบบ (Algorithm Engine Scenarios) 
+● Case Study A: The Oily Acne Patient: AI ต้องการจ่าย BPO และ BHA ผิวแข็งแรงจึง
+อนุญาตให้จ่ายได้ ผิวมันระบบจึงสั่งห้ามเนื้อครีมหนักๆ และแนะนําเป็นเนื้อ Gel 
+● Case Study B: The Sensitive Pigmentation Patient: AI ต้องการจ่าย AHA หรือ 
+L-Ascorbic Acid แต่ผิวอ่อนแอและเป็นรอยดําง่าย ระบบสั่ง OVERRIDE ทันที เปลี่ยนไปใช้
+สารลดเม็ดสีที่ระคายเคืองตํ ่าคือ Tranexamic Acid และ Thiamidol พร้อมบังคับจ่าย 
+Ceramide 3:1:1 
+● Case Study C: The Complex Aging & Acne Patient: AI ต้องการจ่าย Retinoids และ 
+BHA ระบบตรวจพบข้อห้ามผสมผสาน จึงแก้ปัญหาด้วยการจัดตารางเวลาแทน ให้ใช้ BHA และ 
+Peptides ในตอนเช้า และใช้ Retinol ในตอนกลางคืน 
+ส่วนที่ 5: เอกสารอ้างอิง (Clinical References) 
+1. AAD Guidelines for Acne: Zaenglein, A. L., et al. (2016). Guidelines of care for the 
+management of acne vulgaris. Journal of the American Academy of Dermatology 
+(JAAD), 74(5), 945-973. 
+2. Modern Pigmentation Pathways: Bala, H. R., et al. (2018). Oral tranexamic acid for 
+the treatment of melasma: a review. Dermatologic Surgery, 44(6), 814-825. 
+3. Skin Barrier Optimization: Mao-Qiang, M., et al. (1993). Optimization of physiological 
+lipid mixtures for barrier repair. Journal of Investigative Dermatology, 106(5), 
+1096-1101. 
+4. Fitzpatrick & PIH Risks: Taylor, S. C., et al. (2006). Postinflammatory 
+hyperpigmentation. Journal of Cutaneous Medicine and Surgery, 10(1), 17-21. 
+5. Peptide Efficacy & Stability: Schagen, S. K. (2017). Topical Peptide Treatments with 
+Effective Anti-Aging Results. Cosmetics, 4(2), 16. 
