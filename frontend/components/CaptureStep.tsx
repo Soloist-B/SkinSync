@@ -166,8 +166,11 @@ export default function CaptureStep({ onScanComplete }: CaptureStepProps) {
 
       const response = await fetch(`${apiUrl}/predict`, {
         method: "POST",
+        headers: {
+         "ngrok-skip-browser-warning": "69420", // ค่าอะไรก็ได้ที่ไม่ใช่ค่าว่าง
+        },
         body: formData,
-      });
+      });      
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
