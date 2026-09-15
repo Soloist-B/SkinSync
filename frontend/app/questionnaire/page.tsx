@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
@@ -11,9 +11,16 @@ import ProgressBar from '../../components/ProgressBar';
 
 export default function QuestionnairePage() {
   const router = useRouter();
-  const { answers, setAnswer } = useSkinContext();
+  const { answers, setAnswer, aiResult } = useSkinContext();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1);
+
+  // หากยังไม่ได้สแกนภาพใบหน้า ให้กลับไปหน้าถ่ายรูป
+  useEffect(() => {
+    if (!aiResult) {
+      router.push('/camera');
+    }
+  }, [aiResult, router]);
 
   const currentQuestion = CLINICAL_QUESTIONS[currentIndex];
   const selectedValue = answers[currentQuestion.id];

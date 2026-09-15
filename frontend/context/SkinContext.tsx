@@ -17,18 +17,13 @@ import {
 } from '../lib/clinicalEngine';
 import { isSupabaseConfigured, fetchProductsFromSupabase } from '../lib/supabase';
 
-const initialAnswers: QuestionnaireAnswers = {
-  barrier: 'healthy',
-  sensitivity: 'low',
-  sebum: 'combination',
-  fitzpatrick: 'medium',
-};
+const initialAnswers: Partial<QuestionnaireAnswers> = {};
 
 interface SkinSyncState {
   capturedFile: File | null;
   capturedImage: string | null;
   aiResult: AIPredictResponse | null;
-  answers: QuestionnaireAnswers;
+  answers: Partial<QuestionnaireAnswers>;
   isQuestionnaireCompleted: boolean;
   clinicalProfile: ClinicalProfile | null;
   products: SkincareProduct[];
@@ -54,7 +49,7 @@ export function SkinProvider({ children }: { children: ReactNode }) {
   const [capturedFile, setCapturedFile] = useState<File | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [aiResult, setAiResult] = useState<AIPredictResponse | null>(null);
-  const [answers, setAnswers] = useState<QuestionnaireAnswers>(initialAnswers);
+  const [answers, setAnswers] = useState<Partial<QuestionnaireAnswers>>(initialAnswers);
   const [isQuestionnaireCompleted, setIsQuestionnaireCompleted] = useState<boolean>(false);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
@@ -77,15 +72,23 @@ export function SkinProvider({ children }: { children: ReactNode }) {
     loadSupabaseProducts();
   }, []);
 
-  // คำนวณโปรไฟล์ทางคลินิกเมื่อมีทั้ง aiResult และ answers
-  const clinicalProfile: ClinicalProfile | null = useMemo(() => {
-    if (!aiResult) return null;
-    return generateClinicalProfile(aiResult.all_scores, answers);
-  }, [aiResult, answers]);
+  // ตรวจสอบว่าผู้ใช้ตอบคำถามครบทั้ง 4 หมวดแล้วหรือไม่
+  const isAllAnswered = !!(
+    answers.barrier &&
+    answers.sensitivity &&
+    answers.sebum &&
+    answers.fitzpatrick
+  );
 
-  // คำนวณคะแนนสกินแคร์ทั้งหมด (หากยังไม่สแกน จะให้คะแนนเริ่มต้นเพื่อให้ Browse ดูสินค้าได้)
+  // คำนวณโปรไฟล์ทางคลินิกเมื่อมีทั้ง aiResult และ answers ครบถ้วน
+  const clinicalProfile: ClinicalProfile | null = useMemo(() => {
+    if (!aiResult || !isAllAnswered) return null;
+    return generateClinicalProfile(aiResult.all_scores, answers as QuestionnaireAnswers);
+  }, [aiResult, answers, isAllAnswered]);
+
+  // คำนวณคะแนนสกินแคร์ทั้งหมด (หากยังไม่สแกนหรือยังตอบไม่ครบ จะให้คะแนนเริ่มต้นเพื่อให้ Browse ดูสินค้าได้)
   const scoredProducts: ScoredProduct[] = useMemo(() => {
-    if (!clinicalProfile || !aiResult) {
+    if (!clinicalProfile || !aiResult || !isAllAnswered) {
       return products.map((product) => ({
         product,
         score: 0,
@@ -97,10 +100,10 @@ export function SkinProvider({ children }: { children: ReactNode }) {
     return scoreAndFilterProducts(
       products,
       clinicalProfile,
-      answers,
+      answers as QuestionnaireAnswers,
       aiResult.all_scores
     );
-  }, [clinicalProfile, answers, aiResult, products]);
+  }, [clinicalProfile, answers, aiResult, products, isAllAnswered]);
 
   // สกินแคร์อันดับ 1 ในแต่ละหมวดหมู่ 6 หมวด
   const topRecommendations = useMemo(() => {
@@ -111,6 +114,8 @@ export function SkinProvider({ children }: { children: ReactNode }) {
     setCapturedFile(file);
     setCapturedImage(previewUrl);
     setAiResult(result);
+    setAnswers({});
+    setIsQuestionnaireCompleted(false);
     setAnalysisError(null);
   }, []);
 

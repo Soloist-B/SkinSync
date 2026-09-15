@@ -83,27 +83,35 @@ export default function CaptureStep({ onScanComplete }: CaptureStepProps) {
     const startX = (guideLeftOnScreen + offsetX) / scale;
     const startY = (guideTopOnScreen + offsetY) / scale;
 
+    // คำนวณขนาด Output ความละเอียดสูงเพื่อความคมชัด (ไม่ลดขนาดจนภาพแตก)
+    const targetWidth = Math.max(Math.round(cropWidth), 720);
+    const targetHeight = Math.round(targetWidth * (cropHeight / cropWidth));
+
     const canvas = document.createElement("canvas");
-    canvas.width = cropWidth;
-    canvas.height = cropHeight;
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    // ตั้งค่า Image Smoothing คุณภาพสูงสุดเพื่อป้องกันภาพเบลอ
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
 
     // Mask ทรงวงรี
     ctx.beginPath();
     ctx.ellipse(
-      cropWidth / 2,
-      cropHeight / 2,
-      cropWidth / 2,
-      cropHeight / 2,
+      targetWidth / 2,
+      targetHeight / 2,
+      targetWidth / 2,
+      targetHeight / 2,
       0,
       0,
       2 * Math.PI
     );
     ctx.clip();
 
-    // Mirror แนวนอน
-    ctx.translate(cropWidth, 0);
+    // Mirror แนวนอน (เพื่อให้ตรงกับภาพมุมมองกล้องหน้าที่ผู้ใช้เห็นบนจอ)
+    ctx.translate(targetWidth, 0);
     ctx.scale(-1, 1);
 
     ctx.drawImage(
@@ -114,8 +122,8 @@ export default function CaptureStep({ onScanComplete }: CaptureStepProps) {
       cropHeight,
       0,
       0,
-      cropWidth,
-      cropHeight
+      targetWidth,
+      targetHeight
     );
 
     const dataUrl = canvas.toDataURL("image/png");
@@ -308,7 +316,11 @@ export default function CaptureStep({ onScanComplete }: CaptureStepProps) {
                   audio={false}
                   ref={webcamRef}
                   screenshotFormat="image/jpeg"
-                  videoConstraints={{ facingMode: "user" }}
+                  videoConstraints={{
+                    facingMode: "user",
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 },
+                  }}
                   onUserMediaError={() => {
                     setCameraError("ไม่สามารถเปิดกล้องได้ โปรดอนุญาตสิทธิ์กล้อง หรือใช้โหมดอัปโหลดรูปภาพ");
                   }}
