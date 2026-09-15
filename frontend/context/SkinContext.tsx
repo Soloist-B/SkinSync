@@ -31,6 +31,7 @@ interface SkinSyncState {
   topRecommendations: Record<SkincareCategory, ScoredProduct | null>;
   isAnalyzing: boolean;
   analysisError: string | null;
+  isHydrated: boolean;
 }
 
 interface SkinSyncActions {
@@ -54,6 +55,31 @@ export function SkinProvider({ children }: { children: ReactNode }) {
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [products, setProducts] = useState<SkincareProduct[]>(SKINCARE_PRODUCTS);
+  const [isHydrated, setIsHydrated] = useState<boolean>(false);
+
+  // กู้คืนข้อมูลจาก sessionStorage เมื่อผู้ใช้รีเฟรชหน้าเว็บ (ป้องกันผลตรวจหาย)
+  useEffect(() => {
+    try {
+      const savedAi = sessionStorage.getItem('skinsync_ai_result');
+      if (savedAi) {
+        setAiResult(JSON.parse(savedAi));
+      }
+
+      const savedAnswers = sessionStorage.getItem('skinsync_answers');
+      if (savedAnswers) {
+        setAnswers(JSON.parse(savedAnswers));
+      }
+
+      const savedImg = sessionStorage.getItem('skinsync_captured_image');
+      if (savedImg) {
+        setCapturedImage(savedImg);
+      }
+    } catch (e) {
+      console.warn('Failed to rehydrate session data:', e);
+    } finally {
+      setIsHydrated(true);
+    }
+  }, []);
 
   // ดึงข้อมูลจาก Supabase อัตโนมัติ (หากยังไม่ได้ตั้งค่า จะใช้ Local Database เป็น Fallback เสมอ)
   useEffect(() => {
@@ -117,15 +143,36 @@ export function SkinProvider({ children }: { children: ReactNode }) {
     setAnswers({});
     setIsQuestionnaireCompleted(false);
     setAnalysisError(null);
+
+    try {
+      sessionStorage.setItem('skinsync_ai_result', JSON.stringify(result));
+      sessionStorage.removeItem('skinsync_answers');
+      sessionStorage.setItem('skinsync_captured_image', previewUrl);
+    } catch (e) {
+      console.warn('Failed to save scan result to sessionStorage:', e);
+    }
   }, []);
 
   const setAnswer = useCallback(<K extends keyof QuestionnaireAnswers>(key: K, value: QuestionnaireAnswers[K]) => {
-    setAnswers((prev) => ({ ...prev, [key]: value }));
+    setAnswers((prev) => {
+      const updated = { ...prev, [key]: value };
+      try {
+        sessionStorage.setItem('skinsync_answers', JSON.stringify(updated));
+      } catch (e) {
+        console.warn('Failed to save answers to sessionStorage:', e);
+      }
+      return updated;
+    });
   }, []);
 
   const completeQuestionnaire = useCallback((finalAnswers: QuestionnaireAnswers) => {
     setAnswers(finalAnswers);
     setIsQuestionnaireCompleted(true);
+    try {
+      sessionStorage.setItem('skinsync_answers', JSON.stringify(finalAnswers));
+    } catch (e) {
+      console.warn('Failed to save complete answers to sessionStorage:', e);
+    }
   }, []);
 
   const processAnalysis = useCallback(() => {
@@ -143,6 +190,14 @@ export function SkinProvider({ children }: { children: ReactNode }) {
     setIsQuestionnaireCompleted(false);
     setIsAnalyzing(false);
     setAnalysisError(null);
+
+    try {
+      sessionStorage.removeItem('skinsync_ai_result');
+      sessionStorage.removeItem('skinsync_answers');
+      sessionStorage.removeItem('skinsync_captured_image');
+    } catch (e) {
+      console.warn('Failed to clear sessionStorage on reset:', e);
+    }
   }, [capturedImage]);
 
   const value: SkinContextType = {
@@ -157,6 +212,7 @@ export function SkinProvider({ children }: { children: ReactNode }) {
     topRecommendations,
     isAnalyzing,
     analysisError,
+    isHydrated,
     setScanResult,
     setAnswer,
     completeQuestionnaire,

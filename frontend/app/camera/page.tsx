@@ -13,6 +13,10 @@ import {
   RotateCcw,
   ShieldAlert,
   ArrowLeft,
+  ZoomIn,
+  ZoomOut,
+  Crop,
+  Check,
 } from 'lucide-react';
 import { useSkinContext } from '../../context/SkinContext';
 import { AIPredictResponse } from '../../types';
@@ -29,6 +33,20 @@ export default function CameraPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [isCameraSupported, setIsCameraSupported] = useState<boolean>(true);
+
+  // States สำหรับโหมดจัดตำแหน่งรูปภาพที่อัปโหลด (Interactive Pan & Zoom Cropper)
+  const [rawUploadSrc, setRawUploadSrc] = useState<string | null>(null);
+  const [rawFile, setRawFile] = useState<File | null>(null);
+  const [naturalSize, setNaturalSize] = useState<{ width: number; height: number } | null>(null);
+  const [zoom, setZoom] = useState<number>(1);
+  const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [containerSize, setContainerSize] = useState<{ width: number; height: number }>({ width: 360, height: 480 });
+
+  const dragStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const panStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const cropContainerRef = useRef<HTMLDivElement>(null);
+  const rawImgRef = useRef<HTMLImageElement>(null);
 
   // ตรวจสอบว่าเบราว์เซอร์รองรับกล้องหรือไม่ (ถ้าต่อผ่าน IP แบบ HTTP เบราว์เซอร์มือถือจะปิดสิทธิ์ getUserMedia)
   useEffect(() => {
@@ -58,9 +76,37 @@ export default function CameraPage() {
     checkCameraSupport();
   }, []);
 
+  // ปรับขนาด Container สำหรับคำนวณการจัดตำแหน่งรูปภาพ
+  useEffect(() => {
+    if (cropContainerRef.current) {
+      setContainerSize({
+        width: cropContainerRef.current.clientWidth || 360,
+        height: cropContainerRef.current.clientHeight || 480,
+      });
+    }
+  }, [rawUploadSrc]);
+
+  // คำนวณขนาดภาพเริ่มต้นเพื่อครอบคลุมกล่อง 3:4
+  const imageDisplayDimensions = React.useMemo(() => {
+    if (!naturalSize) return null;
+    const baseScale = Math.max(
+      containerSize.width / naturalSize.width,
+      containerSize.height / naturalSize.height
+    );
+    return {
+      baseWidth: naturalSize.width * baseScale,
+      baseHeight: naturalSize.height * baseScale,
+    };
+  }, [naturalSize, containerSize]);
+
   const clearCurrentPreview = () => {
     setImagePreview(null);
     setSelectedFile(null);
+    setRawUploadSrc(null);
+    setRawFile(null);
+    setNaturalSize(null);
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
     setErrorMessage(null);
   };
 
@@ -89,33 +135,26 @@ export default function CameraPage() {
     const guideLeftOnScreen = (clientWidth - guideWidthOnScreen) / 2;
     const guideTopOnScreen = (clientHeight - guideHeightOnScreen) / 2;
 
-    const cropWidth = guideWidthOnScreen / scale;
-    const cropHeight = guideHeightOnScreen / scale;
-    const startX = (guideLeftOnScreen + offsetX) / scale;
-    const startY = (guideTopOnScreen + offsetY) / scale;
+    // คำนวณพิกเซลจริงตามความละเอียดกล้อง 1:1 Native Resolution
+    const cropWidth = Math.round(guideWidthOnScreen / scale);
+    const cropHeight = Math.round(guideHeightOnScreen / scale);
+    const startX = Math.round((guideLeftOnScreen + offsetX) / scale);
+    const startY = Math.round((guideTopOnScreen + offsetY) / scale);
 
-    // คำนวณขนาด Output ความละเอียดสูงเพื่อความคมชัด (ไม่ลดขนาดจนภาพแตก)
-    // หากขนาด crop ต้นทางเล็กกว่า 720px ให้สเกลขึ้นด้วย Bicubic smoothing คุณภาพสูง
-    const targetWidth = Math.max(Math.round(cropWidth), 720);
-    const targetHeight = Math.round(targetWidth * (cropHeight / cropWidth));
-
+    // สร้าง Canvas ตามความละเอียดจริง 100% จากกล้อง ไม่มีการลดทอนหรือสเกล
     const canvas = document.createElement('canvas');
-    canvas.width = targetWidth;
-    canvas.height = targetHeight;
+    canvas.width = cropWidth;
+    canvas.height = cropHeight;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
-    // ตั้งค่า Image Smoothing คุณภาพสูงสุดเพื่อป้องกันภาพเบลอ
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
 
     // Mask ทรงวงรี
     ctx.beginPath();
     ctx.ellipse(
-      targetWidth / 2,
-      targetHeight / 2,
-      targetWidth / 2,
-      targetHeight / 2,
+      cropWidth / 2,
+      cropHeight / 2,
+      cropWidth / 2,
+      cropHeight / 2,
       0,
       0,
       2 * Math.PI
@@ -123,7 +162,7 @@ export default function CameraPage() {
     ctx.clip();
 
     // Mirror แนวนอน (เพื่อให้ตรงกับภาพมุมมองกล้องหน้าที่ผู้ใช้เห็นบนจอ)
-    ctx.translate(targetWidth, 0);
+    ctx.translate(cropWidth, 0);
     ctx.scale(-1, 1);
 
     ctx.drawImage(
@@ -134,8 +173,8 @@ export default function CameraPage() {
       cropHeight,
       0,
       0,
-      targetWidth,
-      targetHeight
+      cropWidth,
+      cropHeight
     );
 
     const dataUrl = canvas.toDataURL('image/png');
@@ -148,18 +187,150 @@ export default function CameraPage() {
     }, 'image/png');
   };
 
-  // 2. เลือกไฟล์รูปภาพ (โหมด Upload)
+  // จัดการการลาก (Pan/Drag) รูปภาพ
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
+    panStartRef.current = { ...pan };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
+    const deltaX = e.clientX - dragStartRef.current.x;
+    const deltaY = e.clientY - dragStartRef.current.y;
+    setPan({
+      x: panStartRef.current.x + deltaX,
+      y: panStartRef.current.y + deltaY,
+    });
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isDragging) {
+      setIsDragging(false);
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {}
+    }
+  };
+
+  // หมุนลูกกลิ้งเมาส์เพื่อซูม
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const delta = e.deltaY * -0.002;
+    setZoom((prev) => Math.min(Math.max(1, +(prev + delta).toFixed(2)), 3.5));
+  };
+
+  // 2. เลือกไฟล์รูปภาพ (โหมด Upload) แล้วเปิดโหมดจัดตำแหน่ง (Pan & Zoom)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setSelectedFile(file);
+      setErrorMessage(null);
 
       const reader = new FileReader();
       reader.onload = () => {
-        setImagePreview(reader.result as string);
+        const result = reader.result as string;
+        const img = new Image();
+        img.onload = () => {
+          setNaturalSize({ width: img.naturalWidth, height: img.naturalHeight });
+          setRawUploadSrc(result);
+          setRawFile(file);
+          setZoom(1);
+          setPan({ x: 0, y: 0 });
+        };
+        img.src = result;
       };
       reader.readAsDataURL(file);
+      e.target.value = '';
     }
+  };
+
+  // กดยืนยันการตัดภาพตามตำแหน่งที่ผู้ใช้จัด (Zoom & Pan)
+  const confirmUploadCrop = () => {
+    if (!cropContainerRef.current || !rawImgRef.current || !naturalSize || !rawFile) return;
+
+    const currentContainerWidth = cropContainerRef.current.clientWidth || 360;
+    const currentContainerHeight = cropContainerRef.current.clientHeight || 480;
+
+    const baseScale = Math.max(
+      currentContainerWidth / naturalSize.width,
+      currentContainerHeight / naturalSize.height
+    );
+    const displayedWidth = naturalSize.width * baseScale * zoom;
+    const displayedHeight = naturalSize.height * baseScale * zoom;
+
+    const centerX = currentContainerWidth / 2;
+    const centerY = currentContainerHeight / 2;
+
+    const imgLeft = centerX + pan.x - displayedWidth / 2;
+    const imgTop = centerY + pan.y - displayedHeight / 2;
+
+    // ขนาดกรอบวงรีมาตรฐาน (rx=96, ry=128)
+    const guideRx = 96;
+    const guideRy = 128;
+    const ovalLeft = centerX - guideRx;
+    const ovalTop = centerY - guideRy;
+    const ovalWidth = guideRx * 2;
+    const ovalHeight = guideRy * 2;
+
+    // คำนวณพิกัดบนรูปภาพขนาดจริง 1:1
+    const screenToNatural = naturalSize.width / displayedWidth;
+    const cropX = (ovalLeft - imgLeft) * screenToNatural;
+    const cropY = (ovalTop - imgTop) * screenToNatural;
+    const cropW = ovalWidth * screenToNatural;
+    const cropH = ovalHeight * screenToNatural;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(cropW));
+    canvas.height = Math.max(1, Math.round(cropH));
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    // Mask ทรงวงรี
+    ctx.beginPath();
+    ctx.ellipse(
+      canvas.width / 2,
+      canvas.height / 2,
+      canvas.width / 2,
+      canvas.height / 2,
+      0,
+      0,
+      2 * Math.PI
+    );
+    ctx.clip();
+
+    ctx.drawImage(
+      rawImgRef.current,
+      cropX,
+      cropY,
+      cropW,
+      cropH,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    const dataUrl = canvas.toDataURL('image/png');
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const cropped = new File([blob], 'face-oval-upload.png', { type: 'image/png' });
+      setSelectedFile(cropped);
+      setImagePreview(dataUrl);
+      setRawUploadSrc(null);
+    }, 'image/png');
+  };
+
+  // ยกเลิกการจัดตำแหน่ง แล้วกลับไปเลือกรูปใหม่
+  const cancelUploadCrop = () => {
+    setRawUploadSrc(null);
+    setRawFile(null);
+    setNaturalSize(null);
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
   };
 
   // 3. กดยืนยันส่งรูปไปประมวลผลที่ Backend API
@@ -171,12 +342,18 @@ export default function CameraPage() {
 
     // ลำดับความสำคัญของ API URL:
     // 1. ดึงจาก NEXT_PUBLIC_API_URL ใน Environment Variables ก่อนเสมอ (เช่น ngrok หรือ Cloud Backend)
-    // 2. ถ้าไม่ได้ตั้งไว้ และเปิดผ่าน IP เครื่อง Local (192.168.x.x) ให้ส่งไปที่พอร์ต 8000 ของเครื่องนั้น
+    // 2. ถ้าไม่ได้ตั้งไว้ ให้ใช้ hostname และ protocol เดียวกับที่กำลังเปิดเว็บ
     // 3. ค่าเริ่มต้น 127.0.0.1:8000
     let apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '') || '';
     if (!apiUrl) {
-      if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        apiUrl = `http://${window.location.hostname}:8000`;
+      if (typeof window !== 'undefined') {
+        const hostname = window.location.hostname;
+        const protocol = window.location.protocol;
+        if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+          apiUrl = `${protocol}//${hostname}:8000`;
+        } else {
+          apiUrl = `${protocol}//127.0.0.1:8000`;
+        }
       } else {
         apiUrl = 'http://127.0.0.1:8000';
       }
@@ -211,9 +388,11 @@ export default function CameraPage() {
       router.push('/questionnaire');
     } catch (err: any) {
       console.error('Prediction error:', err);
-      setErrorMessage(
-        err.message || 'ไม่สามารถเชื่อมต่อ Server ได้ กรุณาตรวจสอบว่า Backend เปิดทำงานอยู่หรือไม่'
-      );
+      let msg = err.message || 'ไม่สามารถเชื่อมต่อ Server ได้ กรุณาตรวจสอบว่า Backend เปิดทำงานอยู่หรือไม่';
+      if (typeof window !== 'undefined' && window.location.protocol === 'https:' && apiUrl.startsWith('http://')) {
+        msg = 'ไม่สามารถส่งข้อมูลได้เนื่องจากเว็บไซต์เปิดด้วย HTTPS แต่ Backend เป็น HTTP (Mixed Content Blocked) กรุณาตั้งค่า NEXT_PUBLIC_API_URL เป็น HTTPS (เช่น ngrok หรือ Cloud Backend)';
+      }
+      setErrorMessage(msg);
     } finally {
       setLoading(false);
     }
@@ -249,7 +428,7 @@ export default function CameraPage() {
         </p>
 
         {/* สลับโหมด ถ่ายรูป / อัปโหลด */}
-        {!imagePreview && (
+        {!imagePreview && !rawUploadSrc && (
           <div className="flex w-full mb-5 bg-gray-100/80 p-1 rounded-2xl border border-gray-200/60">
             <button
               type="button"
@@ -349,8 +528,8 @@ export default function CameraPage() {
                     screenshotFormat="image/jpeg"
                     videoConstraints={{
                       facingMode: 'user',
-                      width: { ideal: 1920 },
-                      height: { ideal: 1080 },
+                      width: { ideal: 3840 },
+                      height: { ideal: 2160 },
                     }}
                     onUserMediaError={() => {
                       setCameraError('ไม่สามารถเปิดกล้องได้ โปรดอนุญาตสิทธิ์กล้อง หรือใช้โหมดอัปโหลดรูปภาพ');
@@ -402,21 +581,140 @@ export default function CameraPage() {
               </div>
             )
           ) : (
-            <div className="w-full flex flex-col items-center">
-              <label className="mb-4 w-full aspect-[3/4] bg-white border-2 border-dashed border-gray-200 hover:border-indigo-300 rounded-3xl flex flex-col items-center justify-center text-gray-400 cursor-pointer transition-all group shadow-xs">
-                <div className="p-3 bg-indigo-50 text-indigo-700 rounded-2xl shadow-xs mb-3 group-hover:scale-105 transition-transform">
-                  <ImageIcon className="w-6 h-6" />
+            rawUploadSrc ? (
+              <div className="w-full flex flex-col items-center animate-fadeIn">
+                {/* Header / Instructions */}
+                <div className="flex items-center justify-between w-full mb-2.5">
+                  <span className="text-xs font-semibold text-gray-800 flex items-center gap-1.5">
+                    <Crop className="w-3.5 h-3.5 text-indigo-600" />
+                    จัดตำแหน่งใบหน้าให้ตรงกรอบวงรี
+                  </span>
+                  <span className="text-[11px] text-gray-400 font-mono font-medium">
+                    {Math.round(zoom * 100)}%
+                  </span>
                 </div>
-                <span className="text-xs font-semibold text-gray-800">คลิกเพื่อเลือกหรือถ่ายภาพใบหน้า</span>
-                <span className="text-[11px] text-gray-400 mt-1">รองรับการกดถ่ายรูปโดยตรง หรือเลือกจากคลังภาพ</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-              </label>
-            </div>
+
+                {/* Cropper Viewport */}
+                <div
+                  ref={cropContainerRef}
+                  onPointerDown={handlePointerDown}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerUp}
+                  onWheel={handleWheel}
+                  className="rounded-3xl overflow-hidden mb-3 bg-black aspect-[3/4] w-full relative shadow-xs flex items-center justify-center border border-gray-800 touch-none select-none cursor-grab active:cursor-grabbing"
+                >
+                  {imageDisplayDimensions && (
+                    <img
+                      ref={rawImgRef}
+                      src={rawUploadSrc}
+                      alt="Uploaded Face"
+                      draggable={false}
+                      className="absolute max-w-none pointer-events-none origin-center"
+                      style={{
+                        width: `${imageDisplayDimensions.baseWidth}px`,
+                        height: `${imageDisplayDimensions.baseHeight}px`,
+                        transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+                      }}
+                    />
+                  )}
+
+                  {/* SVG Oval Guide Overlay */}
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
+                    <defs>
+                      <mask id="face-hole-mask-upload">
+                        <rect width="100%" height="100%" fill="white" />
+                        <ellipse cx="50%" cy="50%" rx="96" ry="128" fill="black" />
+                      </mask>
+                    </defs>
+                    <rect width="100%" height="100%" fill="rgba(0,0,0,0.5)" mask="url(#face-hole-mask-upload)" />
+                    <ellipse cx="50%" cy="50%" rx="96" ry="128" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="2" strokeDasharray="6 6" />
+                  </svg>
+
+                  <span className="absolute bottom-3 text-white/90 text-[11px] bg-black/60 px-3 py-1 rounded-full backdrop-blur-xs pointer-events-none font-medium">
+                    แตะลากเพื่อเลื่อน • ใช้แถบเพื่อซูม
+                  </span>
+                </div>
+
+                {/* Zoom Controls */}
+                <div className="w-full bg-white border border-gray-200/80 rounded-2xl p-2.5 mb-4 shadow-xs flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setZoom((z) => Math.max(1, +(z - 0.2).toFixed(2)))}
+                    className="p-1 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                    title="ซูมออก"
+                  >
+                    <ZoomOut className="w-4 h-4" />
+                  </button>
+
+                  <input
+                    type="range"
+                    min="1"
+                    max="3.5"
+                    step="0.05"
+                    value={zoom}
+                    onChange={(e) => setZoom(parseFloat(e.target.value))}
+                    className="flex-1 accent-indigo-600 h-1.5 bg-gray-200 rounded-lg cursor-pointer"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setZoom((z) => Math.min(3.5, +(z + 0.2).toFixed(2)))}
+                    className="p-1 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                    title="ซูมเข้า"
+                  >
+                    <ZoomIn className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setZoom(1);
+                      setPan({ x: 0, y: 0 });
+                    }}
+                    className="text-[10px] font-medium text-gray-400 hover:text-indigo-600 px-2 py-1 rounded-md border border-gray-200 hover:border-indigo-200 transition-colors cursor-pointer"
+                  >
+                    รีเซ็ต
+                  </button>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 w-full">
+                  <button
+                    type="button"
+                    onClick={cancelUploadCrop}
+                    className="flex-1 py-3 px-4 rounded-2xl border border-gray-200 text-gray-700 text-xs font-medium transition-all flex items-center justify-center gap-2 hover:bg-gray-50 cursor-pointer shadow-xs"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    เลือกรูปใหม่
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={confirmUploadCrop}
+                    className="flex-1 py-3 px-4 rounded-2xl text-white text-xs font-semibold transition-all flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 shadow-xs active:scale-[0.98] cursor-pointer"
+                  >
+                    <Check className="w-4 h-4" />
+                    ตัดภาพตามตำแหน่งนี้
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full flex flex-col items-center">
+                <label className="mb-4 w-full aspect-[3/4] bg-white border-2 border-dashed border-gray-200 hover:border-indigo-300 rounded-3xl flex flex-col items-center justify-center text-gray-400 cursor-pointer transition-all group shadow-xs">
+                  <div className="p-3 bg-indigo-50 text-indigo-700 rounded-2xl shadow-xs mb-3 group-hover:scale-105 transition-transform">
+                    <ImageIcon className="w-6 h-6" />
+                  </div>
+                  <span className="text-xs font-semibold text-gray-800">คลิกเพื่อเลือกหรือถ่ายภาพใบหน้า</span>
+                  <span className="text-[11px] text-gray-400 mt-1">รองรับการกดถ่ายรูปโดยตรง หรือเลือกจากคลังภาพ</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            )
           )
         )}
       </div>

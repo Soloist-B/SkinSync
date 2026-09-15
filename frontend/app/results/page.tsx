@@ -20,15 +20,16 @@ import SkinConcernCard from '../../components/SkinConcernCard';
 
 export default function ResultsPage() {
   const router = useRouter();
-  const { capturedImage, aiResult, clinicalProfile, reset } = useSkinContext();
+  const { capturedImage, aiResult, clinicalProfile, isHydrated, reset } = useSkinContext();
 
   useEffect(() => {
+    if (!isHydrated) return;
     if (!aiResult || !clinicalProfile) {
       router.push('/');
     }
-  }, [aiResult, clinicalProfile, router]);
+  }, [isHydrated, aiResult, clinicalProfile, router]);
 
-  if (!aiResult || !clinicalProfile) return null;
+  if (!isHydrated || !aiResult || !clinicalProfile) return null;
 
   const isCompromised = clinicalProfile.barrier.override;
 

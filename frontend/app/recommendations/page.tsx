@@ -18,15 +18,16 @@ const categoryLabels: Record<SkincareCategory, string> = {
 
 export default function RecommendationsPage() {
   const router = useRouter();
-  const { topRecommendations, clinicalProfile } = useSkinContext();
+  const { topRecommendations, clinicalProfile, isHydrated } = useSkinContext();
 
   useEffect(() => {
+    if (!isHydrated) return;
     if (!clinicalProfile) {
       router.push('/');
     }
-  }, [clinicalProfile, router]);
+  }, [isHydrated, clinicalProfile, router]);
 
-  if (!clinicalProfile) return null;
+  if (!isHydrated || !clinicalProfile) return null;
 
   return (
     <div className="min-h-screen px-5 pt-6 pb-20 max-w-md mx-auto w-full space-y-6 animate-fadeIn">

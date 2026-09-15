@@ -15,7 +15,7 @@ const statusMessages = [
 
 export default function AnalyzingPage() {
   const router = useRouter();
-  const { aiResult, analysisError, processAnalysis } = useSkinContext();
+  const { aiResult, analysisError, processAnalysis, isHydrated } = useSkinContext();
   const [messageIndex, setMessageIndex] = useState(0);
 
   useEffect(() => {
@@ -26,6 +26,7 @@ export default function AnalyzingPage() {
   }, []);
 
   useEffect(() => {
+    if (!isHydrated) return;
     if (aiResult) {
       processAnalysis();
       const timer = setTimeout(() => {
@@ -33,7 +34,9 @@ export default function AnalyzingPage() {
       }, 1800);
       return () => clearTimeout(timer);
     }
-  }, [aiResult, processAnalysis, router]);
+  }, [isHydrated, aiResult, processAnalysis, router]);
+
+  if (!isHydrated) return null;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center max-w-md mx-auto w-full">

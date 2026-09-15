@@ -11,16 +11,17 @@ import ProgressBar from '../../components/ProgressBar';
 
 export default function QuestionnairePage() {
   const router = useRouter();
-  const { answers, setAnswer, aiResult } = useSkinContext();
+  const { answers, setAnswer, aiResult, isHydrated } = useSkinContext();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1);
 
-  // หากยังไม่ได้สแกนภาพใบหน้า ให้กลับไปหน้าถ่ายรูป
+  // หากยังไม่ได้สแกนภาพใบหน้า ให้กลับไปหน้าถ่ายรูป (รอ hydrate ก่อน)
   useEffect(() => {
+    if (!isHydrated) return;
     if (!aiResult) {
       router.push('/camera');
     }
-  }, [aiResult, router]);
+  }, [isHydrated, aiResult, router]);
 
   const currentQuestion = CLINICAL_QUESTIONS[currentIndex];
   const selectedValue = answers[currentQuestion.id];
